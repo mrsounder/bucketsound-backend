@@ -1,11 +1,27 @@
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
+const path = require('path');
 const app = express();
-const PORT = 3000;
+const port = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("BucketSound Backend Running 🔥");
+//
+const dbURI = 'mongodb+srv://mrsounder00:pxDbc4Au0bFgwL0g@cluster0.abcde.mongodb.net/bucketsound?retryWrites=true&w=majority';
+
+mongoose.connect(dbURI)
+  .then(() => console.log('DB Connected! :tada:'))
+  .catch((err) => console.log('DB Error:', err));
+
+app.use(express.json());
+app.use(express.static(__dirname));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log("서버 켜짐: http://localhost:" + PORT);
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
