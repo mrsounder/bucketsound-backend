@@ -4,11 +4,15 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const dbURI = 'mongodb+srv://mrsounder00:pxDbc4Au0bFgwL0g@cluster0.v4gxjro.mongodb.net/bucketsound?retryWrites=true&w=majority';
+// URL ends with directConnection=true to fix ReplicaSetNoPrimary error
+const dbURI = 'mongodb+srv://mrsounder00:pxDbc4Au0bFgwL0g@cluster0.v4gxjro.mongodb.net/bucketsound?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(dbURI)
   .then(() => console.log('DB Connected!'))
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.log('Connection Error Detail:');
+    console.log(err);
+  });
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -18,13 +22,8 @@ const User = mongoose.model('User', new mongoose.Schema({
   userPw: String
 }));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
 app.post('/api/register', async (req, res) => {
   try {
@@ -37,6 +36,4 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+app.listen(port, () => console.log(`Server running on port ${port}`));
